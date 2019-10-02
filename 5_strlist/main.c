@@ -35,7 +35,7 @@ void addV(vector *v, off_t value) {
   }
   v->offsets_arr[v->size - 1] = value;
 }
-char buffer[1024 * 1024 + 1];
+char buffer[128];
 
 int main() {
   char *filename = "myfile";
