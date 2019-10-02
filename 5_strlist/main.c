@@ -11,19 +11,15 @@ typedef struct vector {
 } vector;
 
 vector *newV() {
-  vector *v = malloc(sizeof(vector));
+  vector *v = calloc(sizeof(vector),1);
   if (v == NULL) {
-    perror("malloc");
+    perror("calloc");
     exit(errno);
   }
-  v->size = 0;
-  v->offsets_arr = 0;
-  v->cap = 0;
   return v;
 }
 
 void addV(vector *v, off_t value) {
-  int len;
   v->size++;
   if (v->cap <= v->size) {
     v->cap = (v->size) * 2;
