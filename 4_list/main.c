@@ -3,58 +3,78 @@
 #include <string.h>
 #include <errno.h>
 
-typedef struct vector {
-  unsigned int size;
-  unsigned int cap;
-  char **str_array;
-} vector;
 
-vector *newV() {
-  vector *v = malloc(sizeof(vector));
-  if (v == NULL) {
-    perror("malloc");
-    exit(errno);
-  }
-  v->size = 0;
-  v->str_array = 0;
-  v->cap = 0;
-  return v;
+typedef struct list {
+    struct list *prev;
+    char *str;
+} list;
+
+char *pop(list **ls) {
+    if (*ls == NULL) {
+        return NULL;
+    }
+    list *prev = (*ls)->prev;
+    char *res = (*ls)->str;
+    free(*ls);
+    *ls = prev;
+    return res;
 }
 
-void addV(vector *v, char *str) {
-  int len;
-  v->size++;
-  if (v->cap <= v->size) {
-    v->cap = (v->size) * 2;
-    v->str_array = realloc(v->str_array, v->cap * sizeof(char *));
-  }
-  len = strlen(str) + 1;
-  v->str_array[v->size - 1] = malloc(len);
-  if (v->str_array[v->size - 1] == NULL) {
-    perror("malloc");
-    v->size--;
-  }
-  strcpy(v->str_array[v->size - 1], str);
+void push(list **ls, char *string) {
+    list *new_ls = malloc(sizeof(list));
+    if (new_ls == NULL) {
+        perror("malloc");
+        exit(errno);
+    }
+    size_t len = strlen(string) + 1;
+    new_ls->prev = *ls;
+    new_ls->str = malloc(len);
+    strcpy(new_ls->str, string);
+    *ls = new_ls;
 }
-void printV(vector *v) {
-  for (int i = 0; i < v->size; ++i) {
-    printf("%s", v->str_array[i]);
-  }
+
+void append(list *ls, char *string) {
+    size_t new_size = strlen(ls->str) + strlen(string) + 1;
+    ls->str = realloc(ls->str, new_size);
+    if (ls->str == NULL) {
+        perror("realloc");
+        return;
+    }
+    strcat(ls->str, string);
+}
+
+void reverse(list **ls) {
+    list *new_ls = NULL;
+    char *str_tmp;
+    while (*ls != NULL) {
+        str_tmp = pop(ls);
+        push(&new_ls, str_tmp);
+    }
+    *ls = new_ls;
 }
 
 int main() {
-  char buffer[4048];
-  vector *v = newV();
-  while (1) {
-    if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
-      if(errno)
-        perror("stdin");
-      break;
+    char buffer[16];
+    size_t len;
+    list *ls = NULL;
+    while (1) {
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+            if (errno)
+                perror("stdin");
+            break;
+        }
+        if (buffer[0] == '.')
+            break;
+        push(&ls, buffer);
+        len = strlen(buffer);
+        while (buffer[len - 1] != '\n' && fgets(buffer, sizeof(buffer), stdin) != NULL) {
+            append(ls, buffer);
+            len = strlen(buffer);
+        }
     }
-    if (buffer[0] == '.')
-      break;
-    addV(v, buffer);
-  }
-  printV(v);
-  return 0;
+    reverse(&ls);
+    while (ls != NULL) {
+        printf("%s", pop(&ls));
+    }
+    return 0;
 }
