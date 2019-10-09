@@ -99,7 +99,6 @@ int main() {
     if (!read_timeout()) {
         dump_all(v, fildes);
         return 0;
-
     }
     read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
     int line_id = atoi(buffer);
@@ -122,6 +121,9 @@ int main() {
             write(STDOUT_FILENO, buffer, left);
             if (buffer[left - 1] != '\n')
                 write(STDOUT_FILENO, "\n", 1);
+        }
+        if (!read_timeout()) {
+            return 0;
         }
         read(STDIN_FILENO, buffer, sizeof(buffer) - 1);
         line_id = atoi(buffer);
