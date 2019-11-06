@@ -7,7 +7,7 @@
 
 
 void printhelp(char *filename) {
-    printf("Usage:\n%s /bin/cat /etc/timezon\ne", filename);
+    printf("Usage:\n%s /bin/cat /etc/timezone\n", filename);
 }
 
 int main(int argc, char *argv[]) {
