@@ -10,12 +10,16 @@ void quit_buzz(int signum) {
     exit(0);
 }
 
+void call_buzz(int signum) {
+    printf("\a");
+    fflush(stdout);
+    count++;
+}
+
 void main() {
     signal(SIGQUIT, quit_buzz);
-    while (1) {
-        printf("\a");
-        fflush(stdout);
-        count++;
+    signal(SIGINT, call_buzz);
+    while(1){
         sleep(1);
     }
 }
